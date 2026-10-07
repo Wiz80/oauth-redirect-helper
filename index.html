@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Código de autorización</title>
+<style>
+  body {
+    font-family: -apple-system, system-ui, sans-serif;
+    background: #0f1115;
+    color: #e8e8e8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+    text-align: center;
+  }
+  h1 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+  p.hint { color: #999; font-size: 0.9rem; margin-top: 0; }
+  textarea {
+    width: 100%;
+    max-width: 480px;
+    min-height: 140px;
+    font-family: monospace;
+    font-size: 0.85rem;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #444;
+    background: #1a1d23;
+    color: #e8e8e8;
+    resize: vertical;
+    margin-top: 1rem;
+  }
+  button {
+    margin-top: 1rem;
+    padding: 12px 24px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: none;
+    background: #4f8cff;
+    color: white;
+    cursor: pointer;
+  }
+  button:active { background: #3b6fd4; }
+  .copied { background: #2ecc71 !important; }
+  .error { color: #ff6b6b; }
+</style>
+</head>
+<body>
+  <h1>✅ Autorización completada</h1>
+  <p class="hint">Copia esta URL completa y pégala en el chat con TARS</p>
+  <textarea id="output" readonly></textarea>
+  <button id="copyBtn" onclick="copyIt()">📋 Copiar</button>
+  <p class="hint" id="errMsg"></p>
+
+  <script>
+    const fullUrl = window.location.href;
+    const params = new URLSearchParams(window.location.search);
+    const hasCode = params.has('code');
+
+    document.getElementById('output').value = fullUrl;
+
+    if (!hasCode) {
+      document.getElementById('errMsg').innerText = 'No se detectó un parámetro "code" en la URL — verifica que llegaste aquí desde el flujo de autorización de Google.';
+      document.getElementById('errMsg').classList.add('error');
+    }
+
+    function copyIt() {
+      const el = document.getElementById('output');
+      el.select();
+      el.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(fullUrl).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.innerText = '✅ Copiado';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.innerText = '📋 Copiar';
+          btn.classList.remove('copied');
+        }, 2000);
+      }).catch(() => {
+        document.execCommand('copy');
+      });
+    }
+  </script>
+</body>
+</html>
